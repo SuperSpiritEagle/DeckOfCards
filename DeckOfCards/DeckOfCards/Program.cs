@@ -13,36 +13,43 @@ namespace DeckOfCards
             Player player = new Player();
             Deck deck = new Deck();
 
+            int numberCards = 52;
             string userInput;
             bool isWork = true;
-            int count = deck.GetCountDeck();
 
             deck.CreateDeck();
+            deck.Shuffle();
 
             while (isWork)
             {
+                Console.WriteLine($"Кол-во карт в колоде = {numberCards}");
                 Console.WriteLine($"Хотите взять карту ? {ComandYes} или {ComandNo}");
                 userInput = Console.ReadLine();
 
                 if (userInput == ComandYes)
                 {
-                    List<Card> cards = deck.TakeCard();
-
-                    player.AddCard(cards);
-                    count -= 1;
-
-                    if (count == 0)
-                    {
-                        isWork = false;
-                    }
+                    TookСard(player, deck, ref numberCards);
                 }
                 else if (userInput == ComandNo)
                 {
                     isWork = false;
                 }
+                if (numberCards == 0)
+                {
+                    isWork = false; ;
+                }
             }
 
             player.ShowCards();
+        }
+
+        static public void TookСard(Player player, Deck deck, ref int count)
+        {
+            Card card = deck.TakeCard();
+
+            player.AddCard(card);
+
+            count--;
         }
     }
 
@@ -65,13 +72,13 @@ namespace DeckOfCards
 
     class Deck
     {
-        private string[] _meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
-        private string[] _suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
-
         private List<Card> _cards = new List<Card>();
 
         public void CreateDeck()
         {
+            string[] _meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
+            string[] _suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
+
             for (int i = 0; i < _meaning.Length; i++)
             {
                 for (int j = 0; j < _suits.Length; j++)
@@ -81,40 +88,43 @@ namespace DeckOfCards
             }
         }
 
-        public int GetCountDeck()
-        {
-            return _cards.Count;
-        }
-
-        public List<Card> TakeCard()
+        public void Shuffle()
         {
             Random random = new Random();
-            List<Card> card = new List<Card>();
 
-            int count = _cards.Count;
-            int index = random.Next(0, count);
+            for (int i = _cards.Count - 1; i >= 1; i--)
+            {
+                int j = random.Next(i + 1);
 
-            card.Add(_cards[index]);
-            _cards.RemoveAt(index);
+                Card temp = _cards[j];
+                _cards[j] = _cards[i];
+                _cards[i] = temp;
+            }
+        }
 
-            return card;
+        public Card TakeCard()
+        {
+            Card randomCard = _cards[_cards.Count - 1];
+            _cards.Remove(randomCard);
+
+            return randomCard;
         }
     }
 
     class Player
     {
-        private List<Card> _myСards = new List<Card>();
+        private List<Card> _playerСards = new List<Card>();
 
-        public void AddCard(List<Card> card)
+        public void AddCard(Card card)
         {
-            _myСards.Add(card[0]);
+            _playerСards.Add(card);
         }
 
         public void ShowCards()
         {
-            for (int i = 0; i < _myСards.Count; i++)
+            for (int i = 0; i < _playerСards.Count; i++)
             {
-                _myСards[i].ShowCard();
+                _playerСards[i].ShowCard();
             }
         }
     }
