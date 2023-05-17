@@ -7,49 +7,54 @@ namespace DeckOfCards
     {
         static void Main(string[] args)
         {
+            WorkProgram workProgram = new WorkProgram();
+        }
+    }
+
+    class WorkProgram
+    {
+        private Player _player = new Player();
+        private Deck _deck = new Deck();
+
+        private string _userInput;
+        private bool _isWork = true;
+
+        public WorkProgram()
+        {
             const string ComandYes = "yes";
             const string ComandNo = "no";
 
-            Player player = new Player();
-            Deck deck = new Deck();
+            _deck.Shuffle();
 
-            int numberCards = 52;
-            string userInput;
-            bool isWork = true;
-
-            deck.CreateDeck();
-            deck.Shuffle();
-
-            while (isWork)
+            while (_isWork)
             {
-                Console.WriteLine($"Кол-во карт в колоде = {numberCards}");
+                Console.WriteLine($"Кол-во карт в колоде = {_deck.GetSizeDeck()}");
                 Console.WriteLine($"Хотите взять карту ? {ComandYes} или {ComandNo}");
-                userInput = Console.ReadLine();
+                _userInput = Console.ReadLine();
 
-                if (userInput == ComandYes)
+                if (_userInput == ComandYes)
                 {
-                    TookСard(player, deck, ref numberCards);
+                    TookСard();
                 }
-                else if (userInput == ComandNo)
+                else if (_userInput == ComandNo)
                 {
-                    isWork = false;
+                    _isWork = false;
                 }
-                if (numberCards == 0)
+
+                if (_deck.GetSizeDeck() == 0)
                 {
-                    isWork = false; ;
+                    _isWork = false;
                 }
             }
 
-            player.ShowCards();
+            _player.ShowCards();
         }
 
-        static public void TookСard(Player player, Deck deck, ref int count)
+        private void TookСard()
         {
-            Card card = deck.TakeCard();
+            Card getСard = _deck.TakeCard();
 
-            player.AddCard(card);
-
-            count--;
+            _player.AddCard(getСard);
         }
     }
 
@@ -74,18 +79,23 @@ namespace DeckOfCards
     {
         private List<Card> _cards = new List<Card>();
 
-        public void CreateDeck()
+        public Deck()
         {
-            string[] _meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
-            string[] _suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
+            string[] meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
+            string[] suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
 
-            for (int i = 0; i < _meaning.Length; i++)
+            for (int i = 0; i < meaning.Length; i++)
             {
-                for (int j = 0; j < _suits.Length; j++)
+                for (int j = 0; j < suits.Length; j++)
                 {
-                    _cards.Add(new Card(_meaning[i], _suits[j]));
+                    _cards.Add(new Card(meaning[i], suits[j]));
                 }
             }
+        }
+
+        public int GetSizeDeck()
+        {
+            return _cards.Count;
         }
 
         public void Shuffle()
@@ -94,7 +104,7 @@ namespace DeckOfCards
 
             for (int i = _cards.Count - 1; i >= 1; i--)
             {
-                int j = random.Next(i + 1);
+                int j = random.Next(i, _cards.Count);
 
                 Card temp = _cards[j];
                 _cards[j] = _cards[i];
