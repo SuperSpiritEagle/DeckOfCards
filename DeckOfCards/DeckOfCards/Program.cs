@@ -7,54 +7,49 @@ namespace DeckOfCards
     {
         static void Main(string[] args)
         {
-            WorkProgram workProgram = new WorkProgram();
+            Croupier сroupier = new Croupier();
         }
     }
 
-    class WorkProgram
+    class Croupier
     {
-        private Player _player = new Player();
-        private Deck _deck = new Deck();
-
-        private string _userInput;
-        private bool _isWork = true;
-
-        public WorkProgram()
+        public Croupier()
         {
             const string ComandYes = "yes";
             const string ComandNo = "no";
 
-            _deck.Shuffle();
+            Player player = new Player();
+            Deck deck = new Deck();
 
-            while (_isWork)
+            string userInput;
+            bool isWork = true;
+
+            deck.Shuffle();
+
+            while (isWork)
             {
-                Console.WriteLine($"Кол-во карт в колоде = {_deck.GetSizeDeck()}");
+                Console.WriteLine($"Кол-во карт в колоде = {deck.GetSizeDeck()}");
                 Console.WriteLine($"Хотите взять карту ? {ComandYes} или {ComandNo}");
-                _userInput = Console.ReadLine();
+                userInput = Console.ReadLine();
 
-                if (_userInput == ComandYes)
+                if (userInput == ComandYes)
                 {
-                    TookСard();
+                    player.AddCard(deck.GiveCard());
                 }
-                else if (_userInput == ComandNo)
+                else if (userInput == ComandNo)
                 {
-                    _isWork = false;
+                    isWork = false;
                 }
 
-                if (_deck.GetSizeDeck() == 0)
+                if (deck.GetSizeDeck() == 0)
                 {
-                    _isWork = false;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Колода Пуста!!!");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
-            _player.ShowCards();
-        }
-
-        private void TookСard()
-        {
-            Card getСard = _deck.TakeCard();
-
-            _player.AddCard(getСard);
+            player.ShowCards();
         }
     }
 
@@ -81,16 +76,7 @@ namespace DeckOfCards
 
         public Deck()
         {
-            string[] meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
-            string[] suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
-
-            for (int i = 0; i < meaning.Length; i++)
-            {
-                for (int j = 0; j < suits.Length; j++)
-                {
-                    _cards.Add(new Card(meaning[i], suits[j]));
-                }
-            }
+            CreateDeck();
         }
 
         public int GetSizeDeck()
@@ -104,20 +90,45 @@ namespace DeckOfCards
 
             for (int i = _cards.Count - 1; i >= 1; i--)
             {
-                int j = random.Next(i, _cards.Count);
+                int RandomIndex = random.Next(i, _cards.Count);
 
-                Card temp = _cards[j];
-                _cards[j] = _cards[i];
+                Card temp = _cards[RandomIndex];
+                _cards[RandomIndex] = _cards[i];
                 _cards[i] = temp;
             }
         }
 
-        public Card TakeCard()
+        public Card GiveCard()
         {
+            ControlSizeDeck();
+
             Card randomCard = _cards[_cards.Count - 1];
+
             _cards.Remove(randomCard);
 
             return randomCard;
+        }
+
+        private void CreateDeck()
+        {
+            string[] meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
+            string[] suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
+
+            for (int i = 0; i < meaning.Length; i++)
+            {
+                for (int j = 0; j < suits.Length; j++)
+                {
+                    _cards.Add(new Card(meaning[i], suits[j]));
+                }
+            }
+        }
+
+        private void ControlSizeDeck()
+        {
+            if (_cards.Count <= 0)
+            {
+                _cards.Add(new Card("NULL", "NULL"));
+            }
         }
     }
 
@@ -125,9 +136,9 @@ namespace DeckOfCards
     {
         private List<Card> _playerСards = new List<Card>();
 
-        public void AddCard(Card card)
+        public void AddCard(Card forCard)
         {
-            _playerСards.Add(card);
+            _playerСards.Add(forCard);
         }
 
         public void ShowCards()
