@@ -15,10 +15,10 @@ namespace DeckOfCards
     {
         public Croupier()
         {
-            HandOutCards();
+            DistributeCards();
         }
 
-        private void HandOutCards()
+        private void DistributeCards()
         {
             const string ComandYes = "yes";
             const string ComandNo = "no";
@@ -37,7 +37,7 @@ namespace DeckOfCards
 
                 if (userInput == ComandYes)
                 {
-                    player.AddCard(deck.GiveCard());
+                    player.TakeCard(deck.GiveCard());
                 }
                 else if (userInput == ComandNo)
                 {
@@ -73,6 +73,7 @@ namespace DeckOfCards
         public Deck()
         {
             Create();
+            Shuffle();
         }
 
         public int GetSize()
@@ -82,7 +83,18 @@ namespace DeckOfCards
 
         public Card GiveCard()
         {
-            ControlSize(out Card card);
+            Card card;
+
+            if (_cards.Count > 0)
+            {
+                card = _cards[_cards.Count - 1];
+                _cards.Remove(card);
+            }
+            else
+            {
+                card = null;
+            }
+
             return card;
         }
 
@@ -97,24 +109,6 @@ namespace DeckOfCards
                 {
                     _cards.Add(new Card(meaning[i], suits[j]));
                 }
-            }
-
-            Shuffle();
-        }
-
-        private bool ControlSize(out Card card)
-        {
-            if (_cards.Count > 0)
-            {
-                card = _cards[_cards.Count - 1];
-                _cards.Remove(card);
-
-                return true;
-            }
-            else
-            {
-                card = null;
-                return false;
             }
         }
 
@@ -137,11 +131,11 @@ namespace DeckOfCards
     {
         private List<Card> _cards = new List<Card>();
 
-        public void AddCard(Card Card)
+        public void TakeCard(Card card)
         {
-            if (Card != null)
+            if (card != null)
             {
-                _cards.Add(Card);
+                _cards.Add(card);
             }
             else
             {
