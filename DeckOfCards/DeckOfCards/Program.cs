@@ -15,6 +15,11 @@ namespace DeckOfCards
     {
         public Croupier()
         {
+            HandOutCards();
+        }
+
+        private void HandOutCards()
+        {
             const string ComandYes = "yes";
             const string ComandNo = "no";
 
@@ -24,11 +29,9 @@ namespace DeckOfCards
             string userInput;
             bool isWork = true;
 
-            deck.Shuffle();
-
             while (isWork)
             {
-                Console.WriteLine($"Кол-во карт в колоде = {deck.GetSizeDeck()}");
+                Console.WriteLine($"Кол-во карт в колоде = {deck.GetSize()}");
                 Console.WriteLine($"Хотите взять карту ? {ComandYes} или {ComandNo}");
                 userInput = Console.ReadLine();
 
@@ -39,13 +42,6 @@ namespace DeckOfCards
                 else if (userInput == ComandNo)
                 {
                     isWork = false;
-                }
-
-                if (deck.GetSizeDeck() == 0)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Колода Пуста!!!");
-                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
@@ -64,9 +60,9 @@ namespace DeckOfCards
             _suit = suit;
         }
 
-        public void ShowCard()
+        public void ShowInfo()
         {
-            Console.WriteLine($"Значение : {_meaning} Масть : {_suit}\n");
+            Console.WriteLine($"Значение : {_meaning} - Масть : {_suit}\n");
         }
     }
 
@@ -76,40 +72,21 @@ namespace DeckOfCards
 
         public Deck()
         {
-            CreateDeck();
+            Create();
         }
 
-        public int GetSizeDeck()
+        public int GetSize()
         {
             return _cards.Count;
         }
 
-        public void Shuffle()
-        {
-            Random random = new Random();
-
-            for (int i = _cards.Count - 1; i >= 1; i--)
-            {
-                int RandomIndex = random.Next(i, _cards.Count);
-
-                Card temp = _cards[RandomIndex];
-                _cards[RandomIndex] = _cards[i];
-                _cards[i] = temp;
-            }
-        }
-
         public Card GiveCard()
         {
-            ControlSizeDeck();
-
-            Card randomCard = _cards[_cards.Count - 1];
-
-            _cards.Remove(randomCard);
-
-            return randomCard;
+            ControlSize(out Card card);
+            return card;
         }
 
-        private void CreateDeck()
+        private void Create()
         {
             string[] meaning = new string[] { "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" };
             string[] suits = new string[] { "Трефы", "Пики", "Червы", "Бубны" };
@@ -121,31 +98,64 @@ namespace DeckOfCards
                     _cards.Add(new Card(meaning[i], suits[j]));
                 }
             }
+
+            Shuffle();
         }
 
-        private void ControlSizeDeck()
+        private bool ControlSize(out Card card)
         {
-            if (_cards.Count <= 0)
+            if (_cards.Count > 0)
             {
-                _cards.Add(new Card("NULL", "NULL"));
+                card = _cards[_cards.Count - 1];
+                _cards.Remove(card);
+
+                return true;
+            }
+            else
+            {
+                card = null;
+                return false;
+            }
+        }
+
+        private void Shuffle()
+        {
+            Random random = new Random();
+
+            for (int i = _cards.Count - 1; i >= 1; i--)
+            {
+                int randomIndex = random.Next(i, _cards.Count);
+
+                Card temp = _cards[randomIndex];
+                _cards[randomIndex] = _cards[i];
+                _cards[i] = temp;
             }
         }
     }
 
     class Player
     {
-        private List<Card> _playerСards = new List<Card>();
+        private List<Card> _cards = new List<Card>();
 
-        public void AddCard(Card forCard)
+        public void AddCard(Card Card)
         {
-            _playerСards.Add(forCard);
+            if (Card != null)
+            {
+                _cards.Add(Card);
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Колода Пуста!!!");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         public void ShowCards()
         {
-            for (int i = 0; i < _playerСards.Count; i++)
+            for (int i = 0; i < _cards.Count; i++)
             {
-                _playerСards[i].ShowCard();
+                _cards[i].ShowInfo();
             }
         }
     }
